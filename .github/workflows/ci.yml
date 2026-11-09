@@ -1,0 +1,19 @@
+name: Build and validate survey
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild static page
+        run: python3 scripts/build_site.py
+      - name: Assert generated website is checked in
+        run: git diff --exit-code -- index.html
+      - name: Validate source ledger, exclusion rules, and statistics
+        run: python3 -m unittest discover -s tests -v
